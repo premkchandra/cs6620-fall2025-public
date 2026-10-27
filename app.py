@@ -1,5 +1,6 @@
-# Version: 1.0.1 - Built with GitHub Actions
+# Version: 2.0 - Automated Deployment via GitHub Actions + AWS SSM
 import os
+from datetime import datetime
 APP_VERSION = "2.0"
 CONTAINER_STARTED = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 import re
@@ -145,10 +146,32 @@ def serve_audio_segment():
 @app.route('/')
 def index():
     """
-    Renders the main HTML page for the client-side audio player.
+    Renders the main HTML page with a Version 2.0 deployment banner.
     """
-    return render_template('index.html') 
+    html = render_template('index.html')
+    banner = f'''
+    <div style="background:#1e3a5f;color:#ffffff;padding:12px 16px;font-family:sans-serif;border-bottom:4px solid #4caf50;">
+      <h2 style="margin:0 0 6px 0;">Hello from Automated CI/CD Pipeline!</h2>
+      <p style="margin:2px 0;"><strong>Version:</strong> {APP_VERSION} - Automated Deployment</p>
+      <p style="margin:2px 0;"><strong>Deployed via:</strong> GitHub Actions + AWS SSM</p>
+      <p style="margin:2px 0;"><strong>Container started:</strong> {CONTAINER_STARTED} UTC</p>
+      <p style="margin:2px 0;"><strong>Page loaded:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} UTC</p>
+      <p style="margin:2px 0;"><strong>Assignment:</strong> Automated EC2 Deployment</p>
+    </div>
+    '''
+    return re.sub(r'(<body[^>]*>)', lambda m: m.group(1) + banner, html, count=1, flags=re.IGNORECASE)
 
+
+@app.route('/health')
+def health():
+    return jsonify({
+        'status': 'healthy',
+        'version': APP_VERSION,
+        'deployment_method': 'automated',
+        'container_started': CONTAINER_STARTED,
+        'timestamp': datetime.now().isoformat()
+    })
+    
 @app.route('/select_directory', methods=['POST'])
 def select_directory():
     """
