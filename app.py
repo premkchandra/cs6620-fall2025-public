@@ -1,5 +1,8 @@
-# Version: 1.0.1 - Built with GitHub Actions
+# Version: 2.0 - Automated Deployment via GitHub Actions + AWS SSM
 import os
+from datetime import datetime
+APP_VERSION = "2.0"
+CONTAINER_STARTED = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 import re
 import csv
 from io import StringIO
